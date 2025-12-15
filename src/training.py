@@ -1,6 +1,6 @@
-# src/training.py
+
 """
-Entrenamiento del modelo Random Forest + PCA (MAE RUL<50: 12.16)
+Entrenamiento del modelo Random Forest + PCA
 Estructura MLOps profesional desde src/
 """
 
@@ -77,11 +77,11 @@ def train_rf_pca(X_train_pca, y_train, weights, X_val_pca, y_val):
     print("\n🚀 PASO 2: ENTRENANDO Random Forest PCA...")
     
     rf_pca = RandomForestRegressor(
-        n_estimators=500,
-        max_depth=10,
-        min_samples_split=10,
+        n_estimators=550,
+        min_samples_split=5,
         min_samples_leaf=5,
         max_features='sqrt',
+        max_depth=8,
         random_state=42,
         n_jobs=-1
     )
@@ -109,7 +109,7 @@ def save_model_pipeline(rf_pca, scaler, pca, weights, models_dir, metrics):
     with open(models_dir / "rf_pca_model.pkl", 'wb') as f:
         pickle.dump(rf_pca, f)
     
-    # 2. Pipeline PCA + Scaler (ESENCIAL para inferencia)
+    # 2. Pipeline PCA + Scaler 
     with open(models_dir / "scaler_pca_pipeline.pkl", 'wb') as f:
         pickle.dump({
             'scaler': scaler,

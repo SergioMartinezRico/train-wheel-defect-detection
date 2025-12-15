@@ -37,16 +37,24 @@ def load_and_initial_clean(raw_dir):
     df_raw = pd.read_csv(file_path)
     print(f"   Shape original: {df_raw.shape}")
     
-    # Conversión timestamp
+    # 1. LIMPIAR "ERROR" en timestamp (igual que en Jupyter)
+    print("   Limpiando timestamps 'ERROR'...")
+    initial_rows = len(df_raw)
+    df_raw = df_raw[df_raw['timestamp'] != 'ERROR'].reset_index(drop=True)
+    print(f"   Filas con 'ERROR' eliminadas: {initial_rows - len(df_raw)}")
+    
+    # 2. Conversión timestamp
     print("   Convirtiendo timestamp...")
     df_raw['timestamp'] = pd.to_datetime(df_raw['timestamp'])
     
-    # Eliminar duplicados exactos
+    # 3. Eliminar duplicados exactos (igual que en Jupyter)
     initial_rows = len(df_raw)
-    df_raw = df_raw.drop_duplicates()
+    df_raw = df_raw.drop_duplicates(subset=['timestamp', 'train_id', 'bogie_id'])
     print(f"   Duplicados eliminados: {initial_rows - len(df_raw)}")
     
+    print(f"   Shape limpio: {df_raw.shape}")
     return df_raw
+
 
 def exploratory_plots(df, img_dir):
     """Genera y guarda gráficos exploratorios"""
