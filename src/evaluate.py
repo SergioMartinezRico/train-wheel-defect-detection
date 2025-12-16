@@ -1,8 +1,9 @@
-# src/evaluation.py
+# src/evaluate.py
 """
 Evaluación completa del modelo entrenado
 Compara métricas, feature importance, PCA loadings
 """
+
 
 import pandas as pd
 import numpy as np
@@ -15,6 +16,7 @@ from sklearn.metrics import mean_absolute_error, r2_score, mean_squared_error
 import warnings
 warnings.filterwarnings('ignore')
 
+
 def get_project_paths():
     """Rutas desde src/"""
     BASE_DIR = Path(__file__).parent.parent
@@ -23,6 +25,7 @@ def get_project_paths():
     IMG_DIR = BASE_DIR / "data" / "img"
     IMG_DIR.mkdir(exist_ok=True, parents=True)
     return DATA_DIR, MODELS_DIR, IMG_DIR
+
 
 def load_model_pipeline(models_dir):
     """Carga modelo completo"""
@@ -45,33 +48,35 @@ def load_model_pipeline(models_dir):
     print("✅ Pipeline cargado: RF + PCA + Scaler")
     return rf_pca, scaler, pca, training_metrics
 
-def load_test_data(data_dir):
-    """Carga datos de test"""
-    print("📂 Cargando datos de test...")
-    X_test = pd.read_csv(data_dir / "X_test.csv")
-    y_test = pd.read_csv(data_dir / "y_test.csv")["RUL_steps"].values
-    print(f"✅ X_test: {X_test.shape}, y_test: {y_test.shape}")
-    return X_test, y_test
 
-def evaluate_model(rf_pca, scaler, pca, X_test, y_test, img_dir):
-    """Evaluación completa en test"""
-    print("\n🎯 EVALUACIÓN EN TEST SET")
+def load_validation_data(data_dir):
+    """Carga datos de validación (usados como test)"""
+    print("📂 Cargando datos de validación...")
+    X_val = pd.read_csv(data_dir / "X_val.csv")
+    y_val = pd.read_csv(data_dir / "y_val.csv")["RUL_steps"].values
+    print(f"✅ X_val: {X_val.shape}, y_val: {y_val.shape}")
+    return X_val, y_val
+
+
+def evaluate_model(rf_pca, scaler, pca, X_val, y_val, img_dir):
+    """Evaluación completa en validación"""
+    print("\n🎯 EVALUACIÓN EN VALIDACIÓN")
     
-    # Preprocesamiento test
-    X_test_scaled = scaler.transform(X_test)
-    X_test_pca = pca.transform(X_test_scaled)
+    # Preprocesamiento validación
+    X_val_scaled = scaler.transform(X_val)
+    X_val_pca = pca.transform(X_val_scaled)
     
     # Predicciones
-    y_pred = rf_pca.predict(X_test_pca)
+    y_pred = rf_pca.predict(X_val_pca)
     
     # Métricas
-    mask_critica = y_test < 50
-    mae_total = mean_absolute_error(y_test, y_pred)
-    mae_crit = mean_absolute_error(y_test[mask_critica], y_pred[mask_critica])
-    rmse_total = np.sqrt(mean_squared_error(y_test, y_pred))
-    r2_total = r2_score(y_test, y_pred)
+    mask_critica = y_val < 50
+    mae_total = mean_absolute_error(y_val, y_pred)
+    mae_crit = mean_absolute_error(y_val[mask_critica], y_pred[mask_critica])
+    rmse_total = np.sqrt(mean_squared_error(y_val, y_pred))
+    r2_total = r2_score(y_val, y_pred)
     
-    print(f"📊 RESULTADOS TEST:")
+    print(f"📊 RESULTADOS VALIDACIÓN:")
     print(f"   MAE total:     {mae_total:.2f}")
     print(f"   MAE RUL<50:    {mae_crit:.2f}")
     print(f"   RMSE total:    {rmse_total:.2f}")
@@ -79,7 +84,7 @@ def evaluate_model(rf_pca, scaler, pca, X_test, y_test, img_dir):
     print(f"   Muestras <50:  {mask_critica.sum()}")
     
     # Gráficos
-    plot_predictions(y_test, y_pred, mask_critica, img_dir)
+    plot_predictions(y_val, y_pred, mask_critica, img_dir)
     plot_feature_importance(rf_pca, img_dir)
     plot_pca_loadings(pca, img_dir)
     
@@ -90,6 +95,7 @@ def evaluate_model(rf_pca, scaler, pca, X_test, y_test, img_dir):
         'r2_total': r2_total,
         'samples_critica': int(mask_critica.sum())
     }
+
 
 def plot_predictions(y_true, y_pred, mask_crit, img_dir):
     """Gráficos de predicciones"""
@@ -127,6 +133,7 @@ def plot_predictions(y_true, y_pred, mask_crit, img_dir):
     plt.close()
     print("✅ Gráficos predicciones guardados")
 
+
 def plot_feature_importance(rf_pca, img_dir):
     """Feature importance del Random Forest"""
     importances = rf_pca.feature_importances_
@@ -139,6 +146,8 @@ def plot_feature_importance(rf_pca, img_dir):
     plt.tight_layout()
     plt.savefig(img_dir / "feature_importance_pca.jpg", dpi=300, bbox_inches='tight')
     plt.close()
+    print("✅ Feature importance guardado")
+
 
 def plot_pca_loadings(pca, img_dir):
     """Loadings de PCA"""
@@ -155,6 +164,8 @@ def plot_pca_loadings(pca, img_dir):
     plt.tight_layout()
     plt.savefig(img_dir / "pca_loadings.jpg", dpi=300, bbox_inches='tight')
     plt.close()
+    print("✅ PCA loadings guardado")
+
 
 def evaluation_pipeline():
     """Pipeline completo de evaluación"""
@@ -167,21 +178,22 @@ def evaluation_pipeline():
     # Cargar modelo
     rf_pca, scaler, pca, training_metrics = load_model_pipeline(models_dir)
     
-    # Cargar test
-    X_test, y_test = load_test_data(data_dir)
+    # Cargar validación (usada como test)
+    X_val, y_val = load_validation_data(data_dir)
     
     # Evaluar
-    test_metrics = evaluate_model(rf_pca, scaler, pca, X_test, y_test, img_dir)
+    val_metrics = evaluate_model(rf_pca, scaler, pca, X_val, y_val, img_dir)
     
-    # Comparación training vs test
-    print("\n🏆 COMPARACIÓN TRAINING vs TEST:")
+    # Comparación training vs validación
+    print("\n🏆 COMPARACIÓN TRAINING vs VALIDACIÓN:")
     print(f"Training MAE RUL<50: {training_metrics.get('mae_rul_critica', 'N/A')}")
-    print(f"Test    MAE RUL<50: {test_metrics['mae_critica']:.2f}")
+    print(f"Validación MAE RUL<50: {val_metrics['mae_critica']:.2f}")
     
     print("\n✅ EVALUACIÓN COMPLETA:")
     print("📁 Gráficos: data/img/")
-    print("📊 Métricas guardadas en models/training_metrics.json")
+    print("📊 Métricas en models/training_metrics.json")
     print("=" * 70)
+
 
 if __name__ == "__main__":
     evaluation_pipeline()

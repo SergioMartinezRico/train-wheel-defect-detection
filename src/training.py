@@ -120,14 +120,14 @@ def save_model_pipeline(rf_pca, scaler, pca, weights, models_dir, metrics):
     with open(models_dir / "training_weights.pkl", 'wb') as f:
         pickle.dump(weights, f)
     
-    # 4. Métricas del entrenamiento
+    # 4. Métricas del entrenamiento (CONVERTIR A TIPOS JSON)
     metrics_dict = {
-        'mae_total': metrics[0],
-        'mae_rul_critica': metrics[1],
-        'r2_total': metrics[2],
-        'samples_rul_critica': metrics[3],
-        'pca_components': pca.n_components_,
-        'explained_variance': pca.explained_variance_ratio_.sum()
+        'mae_total': float(metrics[0]),
+        'mae_rul_critica': float(metrics[1]),
+        'r2_total': float(metrics[2]),
+        'samples_rul_critica': int(metrics[3]),  # ← Conversión clave
+        'pca_components': int(pca.n_components_),  # ← Conversión clave
+        'explained_variance': float(pca.explained_variance_ratio_.sum())
     }
     with open(models_dir / "training_metrics.json", 'w') as f:
         import json
@@ -138,6 +138,7 @@ def save_model_pipeline(rf_pca, scaler, pca, weights, models_dir, metrics):
     print("- scaler_pca_pipeline.pkl ⭐ (para predicción)")
     print("- training_weights.pkl")
     print("- training_metrics.json")
+
 
 def training_pipeline():
     """Pipeline completo de entrenamiento"""
