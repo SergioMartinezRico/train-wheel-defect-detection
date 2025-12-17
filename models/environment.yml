@@ -1,0 +1,20 @@
+name: bogie_predictive_maint
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12.10
+  - pip
+  - numpy
+  - pandas
+  - scikit-learn
+  - matplotlib
+  - seaborn
+  - pip:
+      - streamlit
+      - ultralytics # Para YOLOv8 e imágenes
+      - xgboost
+      - opencv-python-headless # Versión optimizada para servidores/apps
+      - pillow
+      - onnx
+      - joblib # Para cargar los modelos .pkl del Random Forest

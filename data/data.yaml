@@ -1,0 +1,9 @@
+train: img/train
+val: img/val
+nc: 4
+names:
+- Cracks-Scratches
+- Discoloration
+- Shelling
+- Wheel
+coco_json: _annotations.coco.json

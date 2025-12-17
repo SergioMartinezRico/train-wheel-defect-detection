@@ -16,6 +16,29 @@ st.set_page_config(
     page_icon="🔧",
     layout="wide"
 )
+# =========================
+# 🎨 FUENTES Y ESTILO GLOBAL
+# =========================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Fuente general */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Métricas, números, outputs técnicos */
+.stMetricValue, code, pre {
+    font-family: 'JetBrains Mono', monospace;
+}
+</style>
+""", unsafe_allow_html=True)
+
+# =========================
+# FIN FUENTES
+# =========================
+st.logo("../data/img/logo.png", size="large")
 
 # ===============================
 # CARGA LOTTIE

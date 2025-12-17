@@ -1,8 +1,30 @@
 import streamlit as st
 import json
 
-st.set_page_config(page_title="Gestión Ferroviaria IA", layout="wide")
+st.set_page_config(page_title="Gestión Ferroviaria IA", page_icon ="../data/img/logo.png",  layout="wide")
 
+# =========================
+# 🎨 FUENTES Y ESTILO GLOBAL
+# =========================
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+/* Fuente general */
+html, body, [class*="css"] {
+    font-family: 'Inter', sans-serif;
+}
+
+/* Métricas, números, outputs técnicos */
+.stMetricValue, code, pre {
+    font-family: 'JetBrains Mono', monospace;
+}
+</style>
+""", unsafe_allow_html=True)
+# =========================
+# FIN FUENTES
+# =========================
+st.logo("../data/img/logo.png", size="large")
 st.title("🚉 Plataforma de Mantenimiento Inteligente")
 st.markdown("""
 Bienvenido al sistema centralizado de análisis ferroviario. Selecciona una herramienta en el menú de la izquierda:
