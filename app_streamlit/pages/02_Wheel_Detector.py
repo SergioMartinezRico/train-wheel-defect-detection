@@ -4,6 +4,7 @@ import numpy as np
 import pickle
 import os
 from PIL import Image
+import datetime 
 
 # ===============================
 # CONFIGURACIÓN DE RUTAS
@@ -89,21 +90,19 @@ if uploaded_file is not None:
             st.warning(f"Se detectaron {n_detections} posibles defectos.")
             
             # Botón para guardar imagen SOLO si hay defectos
+           
+
             if st.button("💾 Guardar imagen con defectos", type="primary"):
-                # Aquí guardas la imagen (ejemplo con PIL)
-                from PIL import Image
-                import os
+                # Convertir a PIL para guardar
+                input_image = Image.fromarray(cv2.cvtColor(annotated_frame, cv2.COLOR_BGR2RGB))
                 
-                # Suponiendo que tienes la imagen original en 'input_image'
-                timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-                filename = f"defecto_{n_detections}_detecciones_{timestamp}.png"
+                # Ruta de guardado en la carpeta actual
+                save_dir = "saved_defects"
+                os.makedirs(save_dir, exist_ok=True)
+                
+                timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+                filename = os.path.join(save_dir, f"defecto_{n_detections}_detecciones_{timestamp}.png")
                 
                 input_image.save(filename)
                 st.success(f"✅ Imagen guardada: **{filename}**")
-                
-                # Opcional: mostrar la imagen guardada
                 st.image(input_image, caption="Imagen guardada", width=400)
-                
-        else:
-            st.success("No se detectaron anomalías.")
-
